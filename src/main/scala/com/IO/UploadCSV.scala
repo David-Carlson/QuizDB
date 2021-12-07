@@ -2,11 +2,14 @@ package com.IO
 import scala.io.Source
 import com.Quiz._
 
-object UploadCSV extends App {
-  readQuestions()
+object UploadCSV extends {
+  def main(args: Array[String]): Unit = {
+    readQuestions()
+  }
 
   def readQuestions(): Unit = {
-    for (line <- Source.fromResource("../data/export_questions.csv").getLines if line.length > 2) {
+    val name = "resources/export_questions.csv"
+    for (line: String <- Source.fromResource(name).getLines if line.length > 2) {
       try {
         val qStr = line.split("\\|").map(_.trim)
         val question: Question = Question.shuffle(qStr(0), qStr(1).split("%"), qStr(2).toInt)
