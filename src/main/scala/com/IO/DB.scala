@@ -1,7 +1,6 @@
-import java.sql.DriverManager
-import java.sql.Connection
-import java.sql.PreparedStatement
-import java.sql.SQLException
+package com.IO
+
+import java.sql.{Connection, DriverManager}
 
 object DB {
   def main(args: Array[String]): Unit = {
@@ -13,7 +12,7 @@ object DB {
     val password = "p4ssword"
 
     // there's probably a better way to do this
-    var connection:Connection = null
+    var connection: Connection = null
 
     try {
       // make the connection
@@ -23,14 +22,12 @@ object DB {
       // create the statement, and run the select query
       val statement = connection.createStatement()
       val resultSet = statement.executeQuery("SELECT * FROM users;")
-      while ( resultSet.next() ) {
-        println(resultSet.getString(1)+", " +resultSet.getString(2) +", " +resultSet.getString(3))
+      while (resultSet.next()) {
+        println(resultSet.getString(1) + ", " + resultSet.getString(2) + ", " + resultSet.getString(3))
       }
     } catch {
       case e: Throwable => e.printStackTrace
     }
     connection.close()
   }
-  }
-
 }

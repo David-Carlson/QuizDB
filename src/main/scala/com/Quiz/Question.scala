@@ -1,4 +1,5 @@
-import scala.collection.AbstractSeq
+package com.Quiz
+
 import scala.util.Random
 
 class Question(question: String, choices: Seq[String], answer: Int) {
