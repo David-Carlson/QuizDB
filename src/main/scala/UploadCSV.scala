@@ -3,11 +3,14 @@ import scala.io.Source
 object UploadCSV extends App {
   readQuestions()
   def readQuestions(): Unit = {
-//    val filename = Source.fromResource("movies.txt")
-    for (line <- Source.fromResource("questions.csv").getLines) {
-      val qStr = line.split("\\|").map(_.trim)
-      println(qStr(2))
+    for (line <- Source.fromResource("./data/export_questions.csv").getLines if line.length > 2) {
+      try {
+        val qStr = line.split("\\|").map(_.trim)
+        val question: Question = Question.shuffle(qStr(0), qStr(1).split("%"), qStr(2).toInt)
+        print(question)
+      } catch {
+        case e: Exception => println(s"Exception: $e, $line")
+      }
     }
   }
-
 }

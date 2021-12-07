@@ -1,14 +1,13 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / scalaVersion := "2.11.12"
 
 lazy val root = (project in file("."))
   .settings(
     name := "QuizGame"
   )
 
-libraryDependencies ++= Seq(
-  "org.scalikejdbc" %% "scalikejdbc"       % "3.5.0",
-  "com.h2database"  %  "h2"                % "1.4.200",
-  "ch.qos.logback"  %  "logback-classic"   % "1.2.3"
-)
+libraryDependencies += "org.apache.spark" %% "spark-core" % "2.4.3"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.4.3"
+libraryDependencies += "org.apache.spark" %% "spark-hive" % "2.4.3"
+libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.25"
