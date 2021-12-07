@@ -12,6 +12,20 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sbt: ch.qos.logback:logback-classic:1.2.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: ch.qos.logback:logback-core:1.2.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.h2database:h2:1.4.200:jar" level="project" />
+    <orderEntry type="library" name="sbt: commons-logging:commons-logging:1.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.commons:commons-dbcp2:2.7.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.commons:commons-pool2:2.7.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.1.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.13.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-core_2.13:3.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation-macro_2.13:3.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation_2.13:3.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc_2.13:3.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:1.7.30:jar" level="project" />
   </component>
 </module>
