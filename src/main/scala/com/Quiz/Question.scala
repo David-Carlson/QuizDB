@@ -3,6 +3,7 @@ package com.Quiz
 import scala.util.Random
 
 class Question(question: String, choices: Seq[String], answer: Int) {
+  val getAnswer = answer
   override def toString: String = {
     question + "\n" + (for ((ans, idx) <- choices.zipWithIndex) yield s"\t${idx + 1}) $ans\n").mkString + "\n"
   }
@@ -10,11 +11,10 @@ class Question(question: String, choices: Seq[String], answer: Int) {
 
 object Question {
   def shuffle(question: String, choices: Seq[String], answer: Int): Question = {
-    val correct: Seq[String]   = for((ans, idx) <- choices.zipWithIndex if idx+1 == answer) yield ans
+    val correct: Seq[String]   = Seq(choices(answer - 1))
     val incorrect: Seq[String] = for((ans, idx) <- choices.zipWithIndex if idx+1 != answer) yield ans
     val newChoices = Random.shuffle(correct ++ incorrect)
     val newAnswer = newChoices.indexOf(correct(0))
-//    val newAnswer = for((ans, idx) <- choices.zipWithIndex if ans == answer) yield idx + 1
     new Question(question, newChoices, newAnswer)
     /*
     	correct = [c for (i,c) in enumerate(self.choices) if (i+1) in self.answers]

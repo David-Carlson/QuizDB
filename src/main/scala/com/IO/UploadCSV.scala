@@ -14,6 +14,7 @@ object UploadCSV extends {
         val qStr = line.split("\\|").map(_.trim)
         val question: Question = Question.shuffle(qStr(0), qStr(1).split("%"), qStr(2).toInt)
         print(question)
+
       } catch {
         case e: Exception => println(s"Exception: $e, $line")
       }
