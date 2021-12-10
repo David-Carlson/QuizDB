@@ -3,13 +3,15 @@ package com.IO
 import java.sql.{Connection, DriverManager}
 
 object DB {
+  val driver = sys.env("driver")
+
   def getConnection(): Connection = {
     val url = sys.env("url")
     val username = sys.env("username")
     val password = sys.env("password")
     DriverManager.getConnection(url, username, password)
   }
-  val driver = sys.env("driver")
+
   def main(args: Array[String]): Unit = {
     var connection: Connection = null
     try {
