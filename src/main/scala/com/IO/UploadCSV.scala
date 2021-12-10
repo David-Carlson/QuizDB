@@ -7,16 +7,19 @@ object UploadCSV extends {
     readQuestions()
   }
 
-  def readQuestions(): Unit = {
+  def readQuestions(): Iterator[String] = {
     val name = "resources/export_questions.csv"
-    for (line: String <- Source.fromResource(name).getLines if line.length > 2) {
+    for (line: String <- Source.fromResource(name).getLines if line.length > 2) yield{
       try {
         val qStr = line.split("\\|").map(_.trim)
         val question: Question = Question.shuffle(qStr(0), qStr(1).split("%"), qStr(2).toInt)
-        print(question)
+        question.toQueryString(1)
 
       } catch {
-        case e: Exception => println(s"Exception: $e, $line")
+        case e: Exception => {
+          println(s"Exception: $e, $line")
+          ("")
+        }
       }
     }
   }

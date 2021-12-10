@@ -1,16 +1,15 @@
 package com.IO
-
-import com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping
-
-import java.sql.{Connection, DriverManager, SQLException, SQLIntegrityConstraintViolationException}
-
+import java.sql.{Connection, DriverManager, PreparedStatement, SQLException, SQLIntegrityConstraintViolationException}
+import com.IO.DBHelper._
 
 object DB {
   val driver = sys.env("driver")
 
   def main(args: Array[String]): Unit = {
 //    test()
-
+    val header = "admin(username, first_name, last_name, password)";
+    val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
+    println(executeUpdate(createInsertString(header, values)))
   }
 
   def getConnection(): Connection = {
@@ -36,9 +35,23 @@ object DB {
     succeeded
   }
 
-  def createInsert(tableHeader: String, values: Seq[String]): String = {
-    "INSERT INTO " + tableHeader + "\nVALUES\n" + values.map(v => s"($v)").mkString(",\n") + ";"
+  def executePreparedUpdate(preparedQuery: String, args: List[Any]): Boolean = {
+    var succeeded = true;
+    var connection: Connection = null
+    try {
+      Class.forName(driver)
+      connection = getConnection()
+      val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
+      statement.executeUpdate(preparedQuery)
+    } catch {
+      case e: SQLException => e.printStackTrace
+        succeeded = false
+    }
+    connection.close()
+    succeeded
   }
+
+
 
 
   def test(): Unit = {

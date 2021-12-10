@@ -1,25 +1,68 @@
 package com.IO
-
-import com.IO.DB.{createInsert, executeUpdate}
+import com.IO.DB.{executeUpdate}
+import com.IO.UploadCSV.{readQuestions}
+import com.IO.DBHelper._
 
 object DataCreator {
   def main(args: Array[String]): Unit = {
-    createAdmin()
+//    createAdmin()
+//    createUser()
+    createQuestions()
   }
 
+
   def createAdmin(): Unit = {
-    val table = "CREATE TABLE admin " +
-      "(username varchar(255) UNIQUE NOT NULL," +
-      "(first_name varchar(100) NOT NULL," +
-      "(last_name varchar(100) NOT NULL," +
-      "(password varchar(100) NOT NULL));" 
-    val header = "admin(username, first_name, last_name, password)";
+    val table = "CREATE TABLE admin (" +
+      "ID SERIAL PRIMARY KEY," +
+      "username varchar(255) UNIQUE NOT NULL," +
+      "first_name varchar(100) NOT NULL," +
+      "last_name varchar(100) NOT NULL," +
+      "password varchar(100) NOT NULL);"
+    val header = "admin(username, first_name, last_name, password)"
     val values = List(
-      "'CSGUY', 'Joe', 'Pesci', '4321'",
-      "'Shades', 'Mr', 'Cool', '4321'")
+      "'root', 'David', 'Carlson', '1234'",
+      "'CSGUY', 'Joe', 'Pesci', '2345'",
+      "'Shades', 'Mr', 'Cool', '2345'")
     println("drop: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
     println("create: " + executeUpdate(table))
-    println("insert: " + executeUpdate(createInsert(header, values)))
+    println("insert: " + executeUpdate(createInsertString(header, values)))
+  }
+
+  def createUser(): Unit = {
+    val table = "CREATE TABLE user (" +
+      "ID SERIAL PRIMARY KEY," +
+      "username varchar(255) UNIQUE NOT NULL," +
+      "first_name varchar(100) NOT NULL," +
+      "last_name varchar(100) NOT NULL," +
+      "password varchar(100) NOT NULL);"
+    val header = "user(username, first_name, last_name, password)"
+    val values = List(
+      "'QGuy', 'Stephen', 'Fry', '1234'",
+      "'Elf1', 'James', 'Harkin', '2345'",
+      "'Elf2', 'Anna', 'Ptaszynski', '2345'")
+    println("drop: " + executeUpdate("DROP TABLE IF EXISTS user;"))
+    println("create: " + executeUpdate(table))
+    println("insert: " + executeUpdate(createInsertString(header, values)))
+  }
+
+  def createQuestions(): Unit = {
+    val table = "CREATE TABLE question (" +
+      "ID SERIAL PRIMARY KEY," +
+      "uploader bigint unsigned references admin(ID)," +
+      "question varchar(200) UNIQUE NOT NULL," +
+      "choice1 varchar(100) NOT NULL," +
+      "choice2 varchar(100) NOT NULL," +
+      "choice3 varchar(100) NOT NULL," +
+      "choice4 varchar(100) NOT NULL," +
+      "answer int CHECK(answer BETWEEN 1 AND 4) NOT NULL);"
+    val header = "question(uploader, question, choice1, choice2, choice3, choice4, answer)"
+    val values = readQuestions().iterator.to(Iterable).take(10)
+//    values.foreach(println)
+    println(createInsertString(header, values))
+    println("drop: " + executeUpdate("DROP TABLE IF EXISTS question;"))
+    println("create: " + executeUpdate(table))
+    println("insert: " + executeUpdate(createInsertString(header, values)))
+
   }
 
 }
