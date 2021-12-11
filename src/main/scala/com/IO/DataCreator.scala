@@ -1,7 +1,7 @@
 package com.IO
 import com.IO.DB.{executePreparedUpdate, executeUpdate}
 import com.IO.UploadCSV.{parseQuestions, parseQuestionsAsStrings}
-import com.IO.DBHelper.{getInsertString, getPreppedInsert, getQuestionPlaceholderValues, getQuestionPlaceholders}
+import com.IO.DBHelper.{getAllPlaceholders, getInsertString, getPreppedInsert, getQuestionPlaceholderValues}
 
 object DataCreator {
   def main(args: Array[String]): Unit = {
@@ -19,13 +19,15 @@ object DataCreator {
       "last_name varchar(100) NOT NULL," +
       "password varchar(100) NOT NULL);"
     val header = "admin(username, first_name, last_name, password)"
+    val prepStr = getAllPlaceholders(3, 4)
     val values = List(
-      "'root', 'David', 'Carlson', '1234'",
-      "'CSGUY', 'Joe', 'Pesci', '2345'",
-      "'Shades', 'Mr', 'Cool', '2345'")
+      List("root", "David", "Carlson", "1234"),
+      List("CSGUY", "Joe", "Pesci", "2345"),
+      List("Shades", "Mr", "Cool", "2345")).flatten
+    println("Handling Admin table...")
     println("drop: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
     println("create: " + executeUpdate(table))
-    println("insert: " + executeUpdate(getInsertString(header, values)))
+    println("insert: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
   }
 
   def createUser(): Unit = {
@@ -36,10 +38,13 @@ object DataCreator {
       "last_name varchar(100) NOT NULL," +
       "password varchar(100) NOT NULL);"
     val header = "user(username, first_name, last_name, password)"
+    val prepStr = getAllPlaceholders(3, 4)
     val values = List(
-      "'QGuy', 'Stephen', 'Fry', '1234'",
-      "'Elf1', 'James', 'Harkin', '2345'",
-      "'Elf2', 'Anna', 'Ptaszynski', '2345'")
+      List("QGuy", "Stephen", "Fry", "1234"),
+      List("Elf1", "James", "Harkin", "2345"),
+      List("Elf2", "Anna", "Ptaszynski", "2345")).flatten
+    
+    println("Handling User table...")
     println("drop: " + executeUpdate("DROP TABLE IF EXISTS user;"))
     println("create: " + executeUpdate(table))
     println("insert: " + executeUpdate(getInsertString(header, values)))
@@ -55,18 +60,14 @@ object DataCreator {
       "choice3 varchar(100) NOT NULL," +
       "choice4 varchar(100) NOT NULL," +
       "answer int CHECK(answer BETWEEN 1 AND 4) NOT NULL);"
-    val questions = parseQuestions().iterator.to(Iterable).take(2).toSeq
+    val questions = parseQuestions().iterator.to(Iterable).toSeq
     val header = "question(uploader, question, choice1, choice2, choice3, choice4, answer)"
-    val prepStr = getQuestionPlaceholders(questions)
+    val prepStr = getAllPlaceholders(questions.length, 7)
     val values = getQuestionPlaceholderValues(questions, 1)
-
-
-    println(getPreppedInsert(header, prepStr))
-    println("drop: " + executeUpdate("DROP TABLE IF EXISTS question;"))
-    println("create: " + executeUpdate(table))
-    println("insert: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
-//    println("insert: " + executeUpdate(createInsertString(header, values)))
-
+    println("Handling Question table...")
+    println("Drop question?: " + executeUpdate("DROP TABLE IF EXISTS question;"))
+    println("Create question?: " + executeUpdate(table))
+    println("Insert questions?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
   }
 
 }

@@ -8,7 +8,6 @@ object DB {
   val driver = sys.env("driver")
 
   def main(args: Array[String]): Unit = {
-//    test()
     val header = "admin(username, first_name, last_name, password)";
     val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
     println(executeUpdate(getInsertString(header, values)))
@@ -21,17 +20,16 @@ object DB {
     DriverManager.getConnection(url, username, password)
   }
 
-  def prepareValues(statement: PreparedStatement, values: ListBuffer[Any]): Unit = {
-    println("Starting preparation")
-    for((v, idx) <- values.zipWithIndex) {
+  def prepareValues(statement: PreparedStatement, values: List[Any]): Unit = {
+    for((v, idx) <- values.zip(LazyList.from(1))) {
       v match {
-        case x: Int => statement.setInt(idx + 1, x)
-        case x: String => statement.setString(idx + 1, x)
-        case _: Any => println("Unhandled prepared type, ")
+        case x: Int => statement.setInt(idx, x)
+        case x: Double => statement.setDouble(idx, x)
+        case x: Float => statement.setFloat(idx, x)
+        case x: String => statement.setString(idx, x)
+        case _ => println(s"Unhandled prepared type")
       }
     }
-    println("Ending preparation")
-
   }
 
   def executeUpdate(query: String): Boolean = {
@@ -50,7 +48,7 @@ object DB {
     succeeded
   }
 
-  def executePreparedUpdate(preparedQuery: String, values: ListBuffer[Any]): Boolean = {
+  def executePreparedUpdate(preparedQuery: String, values: List[Any]): Boolean = {
     var succeeded = true;
     var connection: Connection = null
     try {
@@ -58,7 +56,7 @@ object DB {
       connection = getConnection()
       val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
       prepareValues(statement, values)
-      statement.executeUpdate(preparedQuery)
+      statement.executeUpdate()
     } catch {
       case e: SQLException => e.printStackTrace
         succeeded = false
@@ -66,8 +64,6 @@ object DB {
     connection.close()
     succeeded
   }
-
-
 
 
   def test(): Unit = {
