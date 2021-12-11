@@ -127,3 +127,7 @@ project/plugins/project/
 ### Scala ###
 *.class
 *.log
+
+# bloop and metals
+.bloop
+.bsp
