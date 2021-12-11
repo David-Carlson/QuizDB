@@ -4,10 +4,29 @@ import com.Quiz._
 
 object UploadCSV extends {
   def main(args: Array[String]): Unit = {
-    readQuestions()
+    parseQuestions().foreach(println)
   }
 
-  def readQuestions(): Iterator[String] = {
+  def parseQuestions(): Iterator[Question] = {
+    val name = "resources/export_questions.csv"
+    try {
+      Source.fromResource(name)
+        .getLines()
+        .filter(line => line.nonEmpty)
+        .map(_.split("\\|").map(_.trim))
+        .map(l => new Question(l(0), l(1).split("%"), l(2).toInt))
+    } catch {
+      case e: Exception => {
+        println(s"Exception: $e")
+        Iterator[Question]()
+      }
+    }
+  }
+//  def parseQuestionLine(line: String): Question = {
+//
+//  }
+
+  def parseQuestionsAsStrings(): Iterator[String] = {
     val name = "resources/export_questions.csv"
     for (line: String <- Source.fromResource(name).getLines if line.length > 2) yield{
       try {

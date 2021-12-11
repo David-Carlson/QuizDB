@@ -1,7 +1,7 @@
 package com.IO
-import com.IO.DB.{executeUpdate}
-import com.IO.UploadCSV.{readQuestions}
-import com.IO.DBHelper._
+import com.IO.DB.{executePreparedUpdate, executeUpdate}
+import com.IO.UploadCSV.{parseQuestions, parseQuestionsAsStrings}
+import com.IO.DBHelper.{getInsertString, getPreppedInsert, getQuestionPlaceholderValues, getQuestionPlaceholders}
 
 object DataCreator {
   def main(args: Array[String]): Unit = {
@@ -25,7 +25,7 @@ object DataCreator {
       "'Shades', 'Mr', 'Cool', '2345'")
     println("drop: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
     println("create: " + executeUpdate(table))
-    println("insert: " + executeUpdate(createInsertString(header, values)))
+    println("insert: " + executeUpdate(getInsertString(header, values)))
   }
 
   def createUser(): Unit = {
@@ -42,7 +42,7 @@ object DataCreator {
       "'Elf2', 'Anna', 'Ptaszynski', '2345'")
     println("drop: " + executeUpdate("DROP TABLE IF EXISTS user;"))
     println("create: " + executeUpdate(table))
-    println("insert: " + executeUpdate(createInsertString(header, values)))
+    println("insert: " + executeUpdate(getInsertString(header, values)))
   }
 
   def createQuestions(): Unit = {
@@ -55,13 +55,17 @@ object DataCreator {
       "choice3 varchar(100) NOT NULL," +
       "choice4 varchar(100) NOT NULL," +
       "answer int CHECK(answer BETWEEN 1 AND 4) NOT NULL);"
+    val questions = parseQuestions().iterator.to(Iterable).take(2).toSeq
     val header = "question(uploader, question, choice1, choice2, choice3, choice4, answer)"
-    val values = readQuestions().iterator.to(Iterable).take(10)
-//    values.foreach(println)
-    println(createInsertString(header, values))
+    val prepStr = getQuestionPlaceholders(questions)
+    val values = getQuestionPlaceholderValues(questions, 1)
+
+
+    println(getPreppedInsert(header, prepStr))
     println("drop: " + executeUpdate("DROP TABLE IF EXISTS question;"))
     println("create: " + executeUpdate(table))
-    println("insert: " + executeUpdate(createInsertString(header, values)))
+    println("insert: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+//    println("insert: " + executeUpdate(createInsertString(header, values)))
 
   }
 

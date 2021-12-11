@@ -11,6 +11,9 @@ class Question(question: String, choices: Seq[String], answer: Int) {
     val fchoices = this.choices.map(c => s"'${c}'").mkString(", ")
     s"$uploader, '${this.question}', ${fchoices}, ${answer}"
   }
+  def getValues(): List[Any] = {
+    List(this.question, this.choices(0), this.choices(1), this.choices(2), this.choices(3), this.answer)
+  }
 }
 
 object Question {

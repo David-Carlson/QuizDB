@@ -2,6 +2,8 @@ package com.IO
 import java.sql.{Connection, DriverManager, PreparedStatement, SQLException, SQLIntegrityConstraintViolationException}
 import com.IO.DBHelper._
 
+import scala.collection.mutable.ListBuffer
+
 object DB {
   val driver = sys.env("driver")
 
@@ -9,7 +11,7 @@ object DB {
 //    test()
     val header = "admin(username, first_name, last_name, password)";
     val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
-    println(executeUpdate(createInsertString(header, values)))
+    println(executeUpdate(getInsertString(header, values)))
   }
 
   def getConnection(): Connection = {
@@ -17,6 +19,19 @@ object DB {
     val username = sys.env("username")
     val password = sys.env("password")
     DriverManager.getConnection(url, username, password)
+  }
+
+  def prepareValues(statement: PreparedStatement, values: ListBuffer[Any]): Unit = {
+    println("Starting preparation")
+    for((v, idx) <- values.zipWithIndex) {
+      v match {
+        case x: Int => statement.setInt(idx + 1, x)
+        case x: String => statement.setString(idx + 1, x)
+        case _: Any => println("Unhandled prepared type, ")
+      }
+    }
+    println("Ending preparation")
+
   }
 
   def executeUpdate(query: String): Boolean = {
@@ -35,13 +50,14 @@ object DB {
     succeeded
   }
 
-  def executePreparedUpdate(preparedQuery: String, args: List[Any]): Boolean = {
+  def executePreparedUpdate(preparedQuery: String, values: ListBuffer[Any]): Boolean = {
     var succeeded = true;
     var connection: Connection = null
     try {
       Class.forName(driver)
       connection = getConnection()
       val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
+      prepareValues(statement, values)
       statement.executeUpdate(preparedQuery)
     } catch {
       case e: SQLException => e.printStackTrace
