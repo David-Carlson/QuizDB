@@ -1,8 +1,5 @@
 
 # Goals
-Read JSON/CSV File (output from python)
-Create/destroy tables
-Upload initial data to tables
 Read quiz data
 Upload new ones (with passwords)
 
@@ -33,6 +30,3 @@ choice3 varchar(100) NOT NULL,
 choice5 varchar(100) NOT NULL,
 answer int CHECK(answer BETWEEN 1 AND 4));
 
-
-
-join

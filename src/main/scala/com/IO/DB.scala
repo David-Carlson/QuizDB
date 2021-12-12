@@ -8,9 +8,9 @@ object DB {
   val driver = sys.env("driver")
 
   def main(args: Array[String]): Unit = {
-    val header = "admin(username, first_name, last_name, password)";
-    val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
-    println(executeUpdate(getInsertString(header, values)))
+//    val header = "admin(username, first_name, last_name, password)";
+//    val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
+//    println(executeUpdate(getInsertString(header, values)))
   }
 
   def getConnection(): Connection = {

@@ -5,8 +5,8 @@ import com.IO.DBHelper.{getAllPlaceholders, getInsertString, getPreppedInsert, g
 
 object DataCreator {
   def main(args: Array[String]): Unit = {
-//    createAdmin()
-//    createUser()
+    createAdmin()
+    createUser()
     createQuestions()
   }
 
@@ -25,9 +25,10 @@ object DataCreator {
       List("CSGUY", "Joe", "Pesci", "2345"),
       List("Shades", "Mr", "Cool", "2345")).flatten
     println("Handling Admin table...")
-    println("drop: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
-    println("create: " + executeUpdate(table))
-    println("insert: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+    println("Drop admin?: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
+    println("Create admin?: " + executeUpdate(table))
+    println("Insert admins?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+    println()
   }
 
   def createUser(): Unit = {
@@ -45,9 +46,10 @@ object DataCreator {
       List("Elf2", "Anna", "Ptaszynski", "2345")).flatten
     
     println("Handling User table...")
-    println("drop: " + executeUpdate("DROP TABLE IF EXISTS user;"))
-    println("create: " + executeUpdate(table))
-    println("insert: " + executeUpdate(getInsertString(header, values)))
+    println("Drop user?: " + executeUpdate("DROP TABLE IF EXISTS user;"))
+    println("Create user?: " + executeUpdate(table))
+    println("Insert users?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+    println()
   }
 
   def createQuestions(): Unit = {
@@ -68,6 +70,7 @@ object DataCreator {
     println("Drop question?: " + executeUpdate("DROP TABLE IF EXISTS question;"))
     println("Create question?: " + executeUpdate(table))
     println("Insert questions?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+    println()
   }
 
 }
