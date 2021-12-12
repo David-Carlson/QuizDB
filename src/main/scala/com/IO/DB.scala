@@ -1,5 +1,5 @@
 package com.IO
-import java.sql.{Connection, DriverManager, PreparedStatement, SQLException, SQLIntegrityConstraintViolationException}
+import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet, SQLException, SQLIntegrityConstraintViolationException}
 import com.IO.DBHelper._
 
 import scala.collection.mutable.ListBuffer
@@ -63,6 +63,29 @@ object DB {
     }
     connection.close()
     succeeded
+  }
+
+  def executePreparedQuery[T](preparedQuery: String, values: List[Any], resultBuilder: ResultSet => T): List[T] = {
+    var succeeded = true;
+    var connection: Connection = null
+    var values = List[T]()
+    try {
+      Class.forName(driver)
+      connection = getConnection()
+      val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
+      prepareValues(statement, values)
+      val rs = statement.executeQuery()
+      values = Iterator
+        .continually(rs.next)
+        .takeWhile(identity)
+        .map { _ => resultBuilder(_) }
+
+    } catch {
+      case e: SQLException => e.printStackTrace
+        succeeded = false
+    }
+    connection.close()
+    values
   }
 
 
