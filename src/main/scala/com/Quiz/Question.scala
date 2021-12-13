@@ -2,8 +2,13 @@ package com.Quiz
 
 import scala.util.Random
 
-class Question(question: String, choices: Seq[String], answer: Int) {
+class Question(question: String, choices: Seq[String], answer: Int, id: Int, uploader: Int) {
   val getAnswer = answer
+
+  def this(question: String, choices: Seq[String], answer: Int) {
+    this(question, choices, answer, 1, 1)
+  }
+
   override def toString: String = {
     question + "\n" + (for ((ans, idx) <- choices.zipWithIndex) yield s"\t${idx + 1}) $ans\n").mkString + "\n"
   }
@@ -17,11 +22,11 @@ class Question(question: String, choices: Seq[String], answer: Int) {
 }
 
 object Question {
-  def shuffle(question: String, choices: Seq[String], answer: Int): Question = {
+  def shuffle(question: String, choices: Seq[String], answer: Int, id: Int, uploader: Int): Question = {
     val correct: Seq[String]   = Seq(choices(answer - 1))
     val incorrect: Seq[String] = for((ans, idx) <- choices.zipWithIndex if idx+1 != answer) yield ans
     val newChoices = Random.shuffle(correct ++ incorrect)
     val newAnswer = newChoices.indexOf(correct(0)) + 1
-    new Question(question, newChoices, newAnswer)
+    new Question(question, newChoices, newAnswer, id, uploader)
   }
 }

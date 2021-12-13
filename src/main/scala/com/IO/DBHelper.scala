@@ -1,5 +1,7 @@
 package com.IO
 import com.Quiz.Question
+
+import java.sql.{PreparedStatement, ResultSet}
 import scala.collection.mutable.ListBuffer
 
 object DBHelper {
@@ -27,5 +29,17 @@ object DBHelper {
     val buffer = new ListBuffer[Any]()
     questions.foreach(q => {buffer += uploaderID; buffer ++= q.getValues()})
     buffer.toList
+  }
+
+  def parseQuestion(rs: ResultSet): Question = {
+    val ques = rs.getString("question")
+    val c1 = rs.getString("choice1")
+    val c2 = rs.getString("choice2")
+    val c3 = rs.getString("choice3")
+    val c4 = rs.getString("choice4")
+    val ans = rs.getInt("answer")
+    val id = rs.getInt("ID")
+    val uploader = rs.getInt("uploader")
+    Question.shuffle(ques, List(c1, c2, c3, c4), ans, id, uploader)
   }
 }

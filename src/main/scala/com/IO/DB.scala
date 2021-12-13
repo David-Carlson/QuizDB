@@ -1,6 +1,7 @@
 package com.IO
 import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet, SQLException, SQLIntegrityConstraintViolationException}
 import com.IO.DBHelper._
+import com.Quiz.Question
 
 import scala.collection.mutable.ListBuffer
 
@@ -11,6 +12,7 @@ object DB {
 //    val header = "admin(username, first_name, last_name, password)";
 //    val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
 //    println(executeUpdate(getInsertString(header, values)))
+    executePreparedQuery[Question]("SELECT * from question LIMIT 5;", List(), parseQuestion).foreach(q => println(q.toString))
   }
 
   def getConnection(): Connection = {
@@ -65,7 +67,8 @@ object DB {
     succeeded
   }
 
-  def executePreparedQuery[T](preparedQuery: String, values: List[Any], resultBuilder: ResultSet => T): List[T] = {
+
+  def executePreparedQuery[T](preparedQuery: String, values: List[Any], dataBuilder: ResultSet => T): List[T] = {
     var succeeded = true;
     var connection: Connection = null
     var values = List[T]()
@@ -75,10 +78,38 @@ object DB {
       val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
       prepareValues(statement, values)
       val rs = statement.executeQuery()
+
       values = Iterator
         .continually(rs.next)
         .takeWhile(identity)
-        .map { _ => resultBuilder(_) }
+        .map { _ => dataBuilder(rs) }
+        .toList
+
+    } catch {
+      case e: SQLException => e.printStackTrace
+        succeeded = false
+    }
+    connection.close()
+    values
+  }
+  def executePreparedQuery2(preparedQuery: String, values: List[Any]): List[Question] = {
+    var succeeded = true;
+    var connection: Connection = null
+    var values = List[Question]()
+    try {
+      Class.forName(driver)
+      connection = getConnection()
+      val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
+      prepareValues(statement, values)
+      val rs = statement.executeQuery()
+
+      values = Iterator
+        .continually(rs.next)
+        .takeWhile(identity)
+        .map { res => {
+          parseQuestion(rs)
+        } }
+        .toList
 
     } catch {
       case e: SQLException => e.printStackTrace

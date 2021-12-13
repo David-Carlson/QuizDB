@@ -22,16 +22,13 @@ object UploadCSV extends {
       }
     }
   }
-//  def parseQuestionLine(line: String): Question = {
-//
-//  }
 
   def parseQuestionsAsStrings(): Iterator[String] = {
     val name = "resources/export_questions.csv"
     for (line: String <- Source.fromResource(name).getLines if line.length > 2) yield{
       try {
         val qStr = line.split("\\|").map(_.trim)
-        val question: Question = Question.shuffle(qStr(0), qStr(1).split("%"), qStr(2).toInt)
+        val question: Question = Question.shuffle(qStr(0), qStr(1).split("%"), qStr(2).toInt, 1, 1)
         question.toQueryString(1)
 
       } catch {
