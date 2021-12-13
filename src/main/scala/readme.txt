@@ -30,3 +30,4 @@ choice3 varchar(100) NOT NULL,
 choice5 varchar(100) NOT NULL,
 answer int CHECK(answer BETWEEN 1 AND 4));
 
+eof
