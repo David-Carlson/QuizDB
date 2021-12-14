@@ -4,6 +4,7 @@ import scala.util.Random
 
 class Question(question: String, choices: Seq[String], answer: Int, id: Int, uploader: Int) {
   val getAnswer = answer
+  val getID = id
 
   def this(question: String, choices: Seq[String], answer: Int) {
     this(question, choices, answer, 1, 1)
@@ -26,7 +27,7 @@ class Question(question: String, choices: Seq[String], answer: Int, id: Int, upl
 
 object Question {
   def shuffle(question: String, choices: Seq[String], answer: Int, id: Int, uploader: Int): Question = {
-    val correct: Seq[String]   = Seq(choices(answer - 1))
+    val correct = Seq(choices(answer - 1))
     val incorrect: Seq[String] = for((ans, idx) <- choices.zipWithIndex if idx+1 != answer) yield ans
     val newChoices = Random.shuffle(correct ++ incorrect)
     val newAnswer = newChoices.indexOf(correct(0)) + 1

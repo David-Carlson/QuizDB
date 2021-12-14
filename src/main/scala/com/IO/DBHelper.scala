@@ -48,6 +48,17 @@ object DBHelper {
   def getAllQuestions(): List[Question] = {
     Random.shuffle(executePreparedQuery[Question]("SELECT * from question LIMIT 5;", List(), parseQuestion)
       .map(q => q.shuffle()))
-
+  }
+  def parseLogin(rs: ResultSet): Option[(Int, String)] = {
+    Some(rs.getInt("id"), rs.getString("username"))
+  }
+  def isUser(user: String, password: String): Option[(Int, String)] = {
+    val res = executePreparedQuery[Option[(Int, String)] ](
+      "SELECT id, username from user WHERE username=? AND password=?;",
+      List(user, password), parseLogin)
+    if (res.length == 1)
+      res(0)
+    else
+      None
   }
 }
