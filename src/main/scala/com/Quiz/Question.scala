@@ -19,6 +19,9 @@ class Question(question: String, choices: Seq[String], answer: Int, id: Int, upl
   def getValues(): List[Any] = {
     List(this.question, this.choices(0), this.choices(1), this.choices(2), this.choices(3), this.answer)
   }
+  def shuffle(): Question = {
+    Question.shuffle(this.question, this.choices, this.answer, this.id, this.uploader)
+  }
 }
 
 object Question {

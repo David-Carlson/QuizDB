@@ -1,8 +1,10 @@
 package com.IO
+import com.IO.DB.executePreparedQuery
 import com.Quiz.Question
 
 import java.sql.{PreparedStatement, ResultSet}
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 object DBHelper {
   def main(args: Array[String]): Unit = {
@@ -41,5 +43,11 @@ object DBHelper {
     val id = rs.getInt("ID")
     val uploader = rs.getInt("uploader")
     Question.shuffle(ques, List(c1, c2, c3, c4), ans, id, uploader)
+  }
+
+  def getAllQuestions(): List[Question] = {
+    Random.shuffle(executePreparedQuery[Question]("SELECT * from question LIMIT 5;", List(), parseQuestion)
+      .map(q => q.shuffle()))
+
   }
 }
