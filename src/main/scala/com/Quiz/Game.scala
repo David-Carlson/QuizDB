@@ -1,8 +1,9 @@
 package com.Quiz
 import Question._
-import com.IO.DBHelper.{getAllQuestions, getBestOfN, loginOrCreateAcnt}
+import com.IO.DBHelper.{getAllQuestions, getBestOfN, getBestOfNByUser, loginOrCreateAcnt}
 import com.IO.{DBHelper, IO}
 
+import scala.io.StdIn
 import sys.exit
 
 
@@ -66,14 +67,27 @@ object Game {
   def adminMode(): Unit = {
 
   }
-
-  def viewScores(): Unit = {
-    println("Best scores for 5 questions: ")
+  def printBestOfN(n: Int): Unit = {
+    println(s"Best scores for $n questions: ")
     println("User    Score   Ratio")
-    getBestOfN(5).foreach(res => {
-      println(s"${res._1}    ${res._2}    ${res._3}")
+    println("---------------------")
+    getBestOfN(n).foreach(res => {
+      println(s"${res._1}    ${res._2}    ${res._3}%")
     })
-
+    println()
+  }
+  def printUserBestOf(): Unit = {
+    getBestOfNByUser()
+  }
+  def viewScores(): Unit = {
+    if (logged_in_user.isDefined) {
+      printUserBestOf()
+    }
+    printBestOfN(5)
+    printBestOfN(10)
+    printBestOfN(20)
+    println("Press any key to continue: ")
+    StdIn.readLine()
   }
   def loginOrLogout(): Unit = {
     logged_in_user match {

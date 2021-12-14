@@ -87,13 +87,13 @@ object DBHelper {
     (rs.getString("username"), rs.getInt("best"), rs.getFloat("ratio"))
   }
   def getBestOfN(bestOfN: Int): List[(String, Int, Float)] = {
-    val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect / (totalcorrect + totalincorrect) as ratio " +
+    val query = s"SELECT u.username, bestscoreof${bestOfN} best, round(totalcorrect / (totalcorrect + totalincorrect),2) as ratio " +
       s"FROM score JOIN user u on score.user_id = u.ID ORDER BY bestscoreof${bestOfN} DESC, " +
-      "totalcorrect / (totalcorrect + totalincorrect) DESC LIMIT 5"
+      "totalcorrect / (totalcorrect + totalincorrect) DESC LIMIT 3"
     executePreparedQuery[(String, Int, Float)](parseBestOf, query)
   }
   def getBestOfNByUser(user_id: Int, bestOfN: Int): List[(String, Int, Float)] = {
-    val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect / (totalcorrect + totalincorrect) as ratio " +
+    val query = s"SELECT u.username, bestscoreof${bestOfN} best, round(totalcorrect / (totalcorrect + totalincorrect), 2) as ratio " +
       s"FROM score JOIN user u on score.user_id = u.ID WHERE u.ID=?"
     println(query)
     executePreparedQuery[(String, Int, Float)](parseBestOf, query, List(user_id))
