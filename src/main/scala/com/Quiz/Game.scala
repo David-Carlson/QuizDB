@@ -78,12 +78,15 @@ object Game {
     })
     println()
   }
+
   def printUserBestOf(n: Int, id:Int): Unit = {
     val (_, score, correct, incorrect) = getBestOfNByUser(id, n).head
+    val best = s"Best over $n: "
     val scoreStr: String = f"$score/$n"
-    println(f"Best run:    $scoreStr%5s   Ratio: ${correct.toFloat/(correct + incorrect)}%%")
+    println(f"$best%14s  $scoreStr%5s   Ratio: ${correct.toFloat/(correct + incorrect)}%.2f%%")
     println()
   }
+
   def viewScores(): Unit = {
     if (logged_in_user.isDefined) {
       val (id, name) = ((logged_in_user.get)._1, (logged_in_user.get)._2)
@@ -136,6 +139,10 @@ object Game {
         correct += 1
       else
         incorrect += 1
+    }
+    if (logged_in_user.isEmpty) {
+      println("Login or create an account to save your score!")
+      logInUser()
     }
     println(s"You got $correct right out of $n!")
 
