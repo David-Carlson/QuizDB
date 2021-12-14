@@ -26,6 +26,7 @@ class Question(question: String, choices: Seq[String], answer: Int, id: Int, upl
 }
 
 object Question {
+  val length = 7
   def shuffle(question: String, choices: Seq[String], answer: Int, id: Int, uploader: Int): Question = {
     val correct = Seq(choices(answer - 1))
     val incorrect: Seq[String] = for((ans, idx) <- choices.zipWithIndex if idx+1 != answer) yield ans
@@ -33,4 +34,5 @@ object Question {
     val newAnswer = newChoices.indexOf(correct(0)) + 1
     new Question(question, newChoices, newAnswer, id, uploader)
   }
+
 }

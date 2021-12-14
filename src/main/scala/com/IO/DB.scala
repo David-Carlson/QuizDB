@@ -12,7 +12,7 @@ object DB {
 //    val header = "admin(username, first_name, last_name, password)";
 //    val values: Seq[String] = List("'CSGUY', 'Joe', 'Pesci', '4321'", "'Shades', 'Mr', 'Cool', '4321'")
 //    println(executeUpdate(getInsertString(header, values)))
-    executePreparedQuery[Question]("SELECT * from question LIMIT 5;", List(), parseQuestion).foreach(q => println(q.toString))
+//    executePreparedQuery[Question](parseQuestion, "SELECT * from question LIMIT 5;").foreach(q => println(q.toString))
   }
 
   def getConnection(): Connection = {
@@ -68,7 +68,7 @@ object DB {
   }
 
 
-  def executePreparedQuery[T](preparedQuery: String, values: List[Any], dataBuilder: ResultSet => T): List[T] = {
+  def executePreparedQuery[T](dataBuilder: ResultSet => T, preparedQuery: String, values: List[Any] = List.empty ): List[T] = {
     var succeeded = true;
     var connection: Connection = null
     var results = List[T]()
@@ -92,49 +92,5 @@ object DB {
     connection.close()
     results
   }
-  def executePreparedQuery2(preparedQuery: String, values: List[Any]): List[Question] = {
-    var succeeded = true;
-    var connection: Connection = null
-    var values = List[Question]()
-    try {
-      Class.forName(driver)
-      connection = getConnection()
-      val statement: PreparedStatement = connection.prepareStatement(preparedQuery)
-      prepareValues(statement, values)
-      val rs = statement.executeQuery()
 
-      values = Iterator
-        .continually(rs.next)
-        .takeWhile(identity)
-        .map { hasNext => {
-          parseQuestion(rs)
-        } }
-        .toList
-
-    } catch {
-      case e: SQLException => e.printStackTrace
-        succeeded = false
-    }
-    connection.close()
-    values
-  }
-
-
-  def test(): Unit = {
-    var connection: Connection = null
-    try {
-      Class.forName(driver)
-      connection = getConnection()
-
-      // create the statement, and run the select query
-      val statement = connection.createStatement()
-      val resultSet = statement.executeQuery("SELECT * FROM users;")
-      while (resultSet.next()) {
-        println(resultSet.getString(1) + ", " + resultSet.getString(2) + ", " + resultSet.getString(3))
-      }
-    } catch {
-      case e: SQLException => e.printStackTrace
-    }
-    connection.close()
-  }
 }

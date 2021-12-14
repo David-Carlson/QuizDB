@@ -1,6 +1,6 @@
 package com.Quiz
 import Question._
-import com.IO.DBHelper.{getAllQuestions, loginOrCreateAcnt}
+import com.IO.DBHelper.{getAllQuestions, getBestOfN, loginOrCreateAcnt}
 import com.IO.{DBHelper, IO}
 
 import sys.exit
@@ -9,16 +9,16 @@ import sys.exit
 object Game {
   var logged_in_user: Option[(Int, String)] = None
   def main(args: Array[String]): Unit = {
-//    play_round(5)
+    viewScores()
 
 //    logged_in_user = Some((10, "David"))
-    logged_in_user = loginOrCreateAcnt("user", "Quizlet", "fdsa")
-    logged_in_user match {
-      case Some((id, name)) => {
-        println(s"$id logged in with $name")
-      }
-      case None => println("No user returned")
-    }
+//    logged_in_user = loginOrCreateAcnt("user", "Quizlet", "fdsa")
+//    logged_in_user match {
+//      case Some((id, name)) => {
+//        println(s"$id logged in with $name")
+//      }
+//      case None => println("No user returned")
+//    }
   }
 
 
@@ -68,6 +68,11 @@ object Game {
   }
 
   def viewScores(): Unit = {
+    println("Best scores for 5 questions: ")
+    println("User    Score   Ratio")
+    getBestOfN(5).foreach(res => {
+      println(s"${res._1}    ${res._2}    ${res._3}")
+    })
 
   }
   def loginOrLogout(): Unit = {

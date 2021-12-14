@@ -46,7 +46,7 @@ object DBHelper {
   }
 
   def getAllQuestions(): List[Question] = {
-    Random.shuffle(executePreparedQuery[Question]("SELECT * from question LIMIT 5;", List(), parseQuestion)
+    Random.shuffle(executePreparedQuery[Question](parseQuestion, "SELECT * from question LIMIT 5;")
       .map(q => q.shuffle()))
   }
   def parseLogin(rs: ResultSet): Option[(Int, String)] = {
@@ -54,13 +54,13 @@ object DBHelper {
   }
   def loginOrCreateAcnt(table: String, user: String, password: String): Option[(Int, String)] = {
     val res = executePreparedQuery[Option[(Int, String)] ](
+      parseLogin,
       s"SELECT id, username from $table WHERE username=? AND password=?;",
-      List(user, password), parseLogin)
+      List(user, password))
     if (res.length == 1) {
       res.head
     } else if (executePreparedQuery[Option[(Int, String)] ](
-        s"SELECT id, username from $table WHERE username=?;",
-        List(user), parseLogin).nonEmpty) {
+      parseLogin,s"SELECT id, username from $table WHERE username=?;", List(user)).nonEmpty) {
       println("Password incorrect")
       None
     } else {
@@ -75,11 +75,27 @@ object DBHelper {
     val values = List(username, first, last, password)
     if (executePreparedUpdate(getPreppedInsert(header, prepStr), values)) {
       executePreparedQuery[Option[(Int, String)] ](
+        parseLogin,
         s"SELECT id, username from $table WHERE username=? AND password=?;",
-        List(username, password), parseLogin).head
+        List(username, password)).head
     } else {
       println(s"Error creating $table")
       None
     }
+  }
+  def parseBestOf(rs: ResultSet): (String, Int, Float) = {
+    (rs.getString("username"), rs.getInt("best"), rs.getFloat("ratio"))
+  }
+  def getBestOfN(bestOfN: Int): List[(String, Int, Float)] = {
+    val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect / (totalcorrect + totalincorrect) as ratio " +
+      s"FROM score JOIN user u on score.user_id = u.ID ORDER BY bestscoreof${bestOfN} DESC, " +
+      "totalcorrect / (totalcorrect + totalincorrect) DESC LIMIT 5"
+    executePreparedQuery[(String, Int, Float)](parseBestOf, query)
+  }
+  def getBestOfNByUser(user_id: Int, bestOfN: Int): List[(String, Int, Float)] = {
+    val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect / (totalcorrect + totalincorrect) as ratio " +
+      s"FROM score JOIN user u on score.user_id = u.ID WHERE u.ID=?"
+    println(query)
+    executePreparedQuery[(String, Int, Float)](parseBestOf, query, List(user_id))
   }
 }
