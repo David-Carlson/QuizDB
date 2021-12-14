@@ -10,7 +10,6 @@ object DataCreator {
     createQuestions()
   }
 
-
   def createAdmin(): Unit = {
     val table = "CREATE TABLE admin (" +
       "ID SERIAL PRIMARY KEY," +
@@ -72,5 +71,28 @@ object DataCreator {
     println("Insert questions?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
     println()
   }
+
+//  def createScoreboard(): Unit = {
+//    val table = "CREATE TABLE score (" +
+//      "user_id bigint unsigned references user(ID)," +
+//      "bestscoreof5 int NOT NULL DEFAULT 0," +
+//      "bestscoreof10 int NOT NULL DEFAULT 0," +
+//      "bestscoreof20 int NOT NULL DEFAULT 0," +
+//      "totalcorrect int NOT NULL DEFAULT 0," +
+//      "totalincorrect int NOT NULL DEFAULT 0);"
+//    val header = "score(user_id, bestscoreof5, bestscoreof10, bestscoreof20, totalcorrect, totalincorrect)"
+//    val values = List(
+//      List(1, 3, "Carlson", "1234"),
+//      List(2, "Joe", "Pesci", "2345"),
+//      List(3, "Mr", "Cool", "2345")).flatten
+//
+//    val prepStr = getAllPlaceholders(3, 7)
+//    val values = getQuestionPlaceholderValues(questions, 1)
+//    println("Handling Scoreboard table...")
+//    println("Drop Scoreboard?: " + executeUpdate("DROP TABLE IF EXISTS scoreboard;"))
+//    println("Create Scoreboard?: " + executeUpdate(table))
+//    println("Insert Scoreboard?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+//    println()
+//  }
 
 }

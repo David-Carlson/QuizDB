@@ -71,7 +71,7 @@ object DB {
   def executePreparedQuery[T](preparedQuery: String, values: List[Any], dataBuilder: ResultSet => T): List[T] = {
     var succeeded = true;
     var connection: Connection = null
-    var values = List[T]()
+    var results = List[T]()
     try {
       Class.forName(driver)
       connection = getConnection()
@@ -79,7 +79,7 @@ object DB {
       prepareValues(statement, values)
       val rs = statement.executeQuery()
 
-      values = Iterator
+      results = Iterator
         .continually(rs.next)
         .takeWhile(identity)
         .map { _ => dataBuilder(rs) }
@@ -90,7 +90,7 @@ object DB {
         succeeded = false
     }
     connection.close()
-    values
+    results
   }
   def executePreparedQuery2(preparedQuery: String, values: List[Any]): List[Question] = {
     var succeeded = true;
@@ -106,7 +106,7 @@ object DB {
       values = Iterator
         .continually(rs.next)
         .takeWhile(identity)
-        .map { res => {
+        .map { hasNext => {
           parseQuestion(rs)
         } }
         .toList

@@ -1,5 +1,5 @@
 package com.IO
-import com.IO.DB.executePreparedQuery
+import com.IO.DB.{executePreparedQuery, executePreparedUpdate}
 import com.Quiz.Question
 
 import java.sql.{PreparedStatement, ResultSet}
@@ -52,13 +52,34 @@ object DBHelper {
   def parseLogin(rs: ResultSet): Option[(Int, String)] = {
     Some(rs.getInt("id"), rs.getString("username"))
   }
-  def isUser(user: String, password: String): Option[(Int, String)] = {
+  def loginOrCreateAcnt(table: String, user: String, password: String): Option[(Int, String)] = {
     val res = executePreparedQuery[Option[(Int, String)] ](
-      "SELECT id, username from user WHERE username=? AND password=?;",
+      s"SELECT id, username from $table WHERE username=? AND password=?;",
       List(user, password), parseLogin)
-    if (res.length == 1)
-      res(0)
-    else
+    if (res.length == 1) {
+      res.head
+    } else if (executePreparedQuery[Option[(Int, String)] ](
+        s"SELECT id, username from $table WHERE username=?;",
+        List(user), parseLogin).nonEmpty) {
+      println("Password incorrect")
       None
+    } else {
+      println(s"Creating a new $table...")
+      val (first, last) = IO.inputFirstLastName()
+      createNewUser(table, user, first, last, password)
+    }
+  }
+  def createNewUser(table: String, username: String, first: String, last:String, password: String): Option[(Int, String)] = {
+    val header = s"${table}(username, first_name, last_name, password)"
+    val prepStr = getAllPlaceholders(1, 4)
+    val values = List(username, first, last, password)
+    if (executePreparedUpdate(getPreppedInsert(header, prepStr), values)) {
+      executePreparedQuery[Option[(Int, String)] ](
+        s"SELECT id, username from $table WHERE username=? AND password=?;",
+        List(username, password), parseLogin).head
+    } else {
+      println(s"Error creating $table")
+      None
+    }
   }
 }

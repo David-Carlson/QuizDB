@@ -1,7 +1,8 @@
 package com.Quiz
 import Question._
-import com.IO.DBHelper.getAllQuestions
-import com.IO.IO
+import com.IO.DBHelper.{getAllQuestions, loginOrCreateAcnt}
+import com.IO.{DBHelper, IO}
+
 import sys.exit
 
 
@@ -9,27 +10,31 @@ object Game {
   var logged_in_user: Option[(Int, String)] = None
   def main(args: Array[String]): Unit = {
 //    play_round(5)
-    logged_in_user = Some((10, "David"))
+
+//    logged_in_user = Some((10, "David"))
+    logged_in_user = loginOrCreateAcnt("user", "Quizlet", "fdsa")
     logged_in_user match {
       case Some((id, name)) => {
-        println(s"$id with $name")
+        println(s"$id logged in with $name")
       }
-      case None => println("No user")
+      case None => println("No user returned")
     }
   }
 
 
-  def main_menu(): Unit = {
+  def mainMenu(): Unit = {
     while(true) {
       printMenu()
       var ans = IO.getInt(0, 6)
       ans match {
-        case 1 => play_round(5)
-        case 2 => play_round(10)
-        case 3 => play_round(20)
-        case 4 => admin_mode()
-        case 5 => view_scores()
+        case 1 => playRound(5)
+        case 2 => playRound(10)
+        case 3 => playRound(20)
+        case 4 => adminMode()
+        case 5 => viewScores()
+        case 6 => loginOrLogout()
         case 0 => sys.exit
+        case _ => println("Didn't understand command")
       }
     }
   }
@@ -58,27 +63,31 @@ object Game {
     println("4) Enter admin mode")
     println("5) View scores")
   }
-  def admin_mode(): Unit = {
+  def adminMode(): Unit = {
 
   }
 
-  def view_scores(): Unit = {
+  def viewScores(): Unit = {
 
   }
-  def log_in_or_out(): Unit = {
+  def loginOrLogout(): Unit = {
     logged_in_user match {
       case Some((id, name)) =>
         println(s"Bye bye, $name!")
         logged_in_user = None
-      case None =>
-        println("Enter your username and password in one line: ")
-
+      case None => logInUser()
     }
+  }
+  def logInUser(): Unit = {
+    do {
+      val (user, password) = IO.inputUserAndPassword()
+      logged_in_user = DBHelper.loginOrCreateAcnt("user", user, password)
+    } while (logged_in_user.isEmpty)
   }
 
 
   // Ask how many questions
-  def play_round(n: Int): Unit = {
+  def playRound(n: Int): Unit = {
     val allQuestions = getAllQuestions().take(n)
 
     var results = for ((q, idx) <- allQuestions.zip(LazyList.from(1))) yield {
