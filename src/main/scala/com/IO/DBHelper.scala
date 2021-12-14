@@ -83,19 +83,18 @@ object DBHelper {
       None
     }
   }
-  def parseBestOf(rs: ResultSet): (String, Int, Float) = {
-    (rs.getString("username"), rs.getInt("best"), rs.getFloat("ratio"))
+  def parseBestOf(rs: ResultSet): (String, Int, Int, Int) = {
+    (rs.getString("username"), rs.getInt("best"), rs.getInt("totalcorrect"), rs.getInt("totalincorrect"))
   }
-  def getBestOfN(bestOfN: Int): List[(String, Int, Float)] = {
-    val query = s"SELECT u.username, bestscoreof${bestOfN} best, round(totalcorrect / (totalcorrect + totalincorrect),2) as ratio " +
+  def getBestOfN(bestOfN: Int): List[(String, Int, Int, Int)] = {
+    val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect, totalincorrect " +
       s"FROM score JOIN user u on score.user_id = u.ID ORDER BY bestscoreof${bestOfN} DESC, " +
       "totalcorrect / (totalcorrect + totalincorrect) DESC LIMIT 3"
-    executePreparedQuery[(String, Int, Float)](parseBestOf, query)
+    executePreparedQuery[(String, Int, Int, Int)](parseBestOf, query)
   }
-  def getBestOfNByUser(user_id: Int, bestOfN: Int): List[(String, Int, Float)] = {
-    val query = s"SELECT u.username, bestscoreof${bestOfN} best, round(totalcorrect / (totalcorrect + totalincorrect), 2) as ratio " +
+  def getBestOfNByUser(user_id: Int, bestOfN: Int): List[(String, Int, Int, Int)] = {
+    val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect, totalincorrect " +
       s"FROM score JOIN user u on score.user_id = u.ID WHERE u.ID=?"
-    println(query)
-    executePreparedQuery[(String, Int, Float)](parseBestOf, query, List(user_id))
+    executePreparedQuery[(String, Int, Int, Int)](parseBestOf, query, List(user_id))
   }
 }

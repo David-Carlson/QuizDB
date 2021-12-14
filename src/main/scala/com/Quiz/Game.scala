@@ -10,8 +10,10 @@ import sys.exit
 object Game {
   var logged_in_user: Option[(Int, String)] = None
   def main(args: Array[String]): Unit = {
+    logged_in_user = Some((1, "QGuy"))
     viewScores()
 
+//    mainMenu()
 //    logged_in_user = Some((10, "David"))
 //    logged_in_user = loginOrCreateAcnt("user", "Quizlet", "fdsa")
 //    logged_in_user match {
@@ -26,20 +28,20 @@ object Game {
   def mainMenu(): Unit = {
     while(true) {
       printMenu()
-      var ans = IO.getInt(0, 6)
-      ans match {
+        IO.getInt(0, 6) match {
         case 1 => playRound(5)
         case 2 => playRound(10)
         case 3 => playRound(20)
         case 4 => adminMode()
         case 5 => viewScores()
         case 6 => loginOrLogout()
-        case 0 => sys.exit
+        case 0 => exit
         case _ => println("Didn't understand command")
       }
     }
   }
   def printMenu(): Unit = {
+    IO.printBreak()
     logged_in_user match {
       case Some((id, name)) => {
         println(s"Welcome back, $name, to QuizBowl!")
@@ -56,7 +58,6 @@ object Game {
     println()
   }
   private def print_middle_menu(): Unit = {
-    println("Enter a number: ")
     println()
     println("1) Play a round of 5 questions")
     println("2) Play a round of 10 questions")
@@ -70,23 +71,34 @@ object Game {
   def printBestOfN(n: Int): Unit = {
     println(s"Best scores for $n questions: ")
     println("User    Score   Ratio")
-    println("---------------------")
+    IO.printShortBreak()
     getBestOfN(n).foreach(res => {
-      println(s"${res._1}    ${res._2}    ${res._3}%")
+      val percent = res._3.toFloat/(res._3 + res._4)
+      println(f"${res._1}    ${res._2}%2d    $percent%.2f%%")
     })
     println()
   }
-  def printUserBestOf(): Unit = {
-    getBestOfNByUser((logged_in_user.get)._1, 5)
+  def printUserBestOf(n: Int, id:Int): Unit = {
+    val (_, score, correct, incorrect) = getBestOfNByUser(id, n).head
+    val scoreStr: String = f"$score/$n"
+    println(f"Best run:    $scoreStr%5s   Ratio: ${correct.toFloat/(correct + incorrect)}%%")
+    println()
   }
   def viewScores(): Unit = {
     if (logged_in_user.isDefined) {
-      printUserBestOf()
+      val (id, name) = ((logged_in_user.get)._1, (logged_in_user.get)._2)
+      println(s"$name's best scores: ")
+      IO.printShortBreak()
+      printUserBestOf(20, id)
+      printUserBestOf(10, id)
+      printUserBestOf(5, id)
+      println("Press Enter to continue: ")
+      StdIn.readLine()
     }
     printBestOfN(20)
     printBestOfN(10)
     printBestOfN(5)
-    println("Press any key to continue: ")
+    println("Press Enter to continue: ")
     StdIn.readLine()
   }
   def loginOrLogout(): Unit = {

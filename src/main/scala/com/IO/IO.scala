@@ -2,6 +2,12 @@ package com.IO
 import scala.io.StdIn
 
 object IO {
+  def printBreak(): Unit = {
+    println("---------------------------------")
+  }
+  def printShortBreak(): Unit = {
+    println("---------------------")
+  }
   def getInt(min: Int = 1, max: Int = 4): Int = {
     var num = -1
     do {
