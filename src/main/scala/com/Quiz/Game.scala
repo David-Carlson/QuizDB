@@ -77,15 +77,15 @@ object Game {
     println()
   }
   def printUserBestOf(): Unit = {
-    getBestOfNByUser()
+    getBestOfNByUser((logged_in_user.get)._1, 5)
   }
   def viewScores(): Unit = {
     if (logged_in_user.isDefined) {
       printUserBestOf()
     }
-    printBestOfN(5)
-    printBestOfN(10)
     printBestOfN(20)
+    printBestOfN(10)
+    printBestOfN(5)
     println("Press any key to continue: ")
     StdIn.readLine()
   }
