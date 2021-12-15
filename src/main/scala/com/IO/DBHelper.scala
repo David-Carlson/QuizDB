@@ -1,5 +1,5 @@
 package com.IO
-import com.IO.DB.{executePreparedQuery, executePreparedUpdate}
+import com.IO.DB.{executePreparedQuery, executePreparedUpdate, executeUpdate}
 import com.Quiz.Question
 
 import java.sql.{PreparedStatement, ResultSet}
@@ -49,25 +49,31 @@ object DBHelper {
     Random.shuffle(executePreparedQuery[Question](parseQuestion, "SELECT * from question LIMIT 5;")
       .map(q => q.shuffle()))
   }
-  def parseLogin(rs: ResultSet): Option[(Int, String)] = {
-    Some(rs.getInt("id"), rs.getString("username"))
+  def parseLogin(rs: ResultSet): (Int, String) = {
+    (rs.getInt("id"), rs.getString("username"))
   }
-  def loginOrCreateAcnt(table: String, user: String, password: String): Option[(Int, String)] = {
-    val res = executePreparedQuery[Option[(Int, String)] ](
+  def loginOrCreateAcnt(user: String, password: String): Option[(Int, String)] = {
+    val res = executePreparedQuery[(Int, String)](
       parseLogin,
-      s"SELECT id, username from $table WHERE username=? AND password=?;",
+      s"SELECT id, username from user WHERE username=? AND password=?;",
       List(user, password))
     if (res.length == 1) {
-      res.head
-    } else if (executePreparedQuery[Option[(Int, String)] ](
-      parseLogin,s"SELECT id, username from $table WHERE username=?;", List(user)).nonEmpty) {
+      res.headOption
+    } else if (executePreparedQuery[(Int, String)](
+      parseLogin,s"SELECT id, username from user WHERE username=?;", List(user)).nonEmpty) {
       println("Password incorrect")
       None
     } else {
-      println(s"Creating a new $table...")
+      println(s"Creating a new user...")
       val (first, last) = IO.inputFirstLastName()
-      createNewUser(table, user, first, last, password)
+      createNewUser("user", user, first, last, password)
     }
+  }
+  def loginAdmin(admin: String, password: String): Option[(Int, String)] = {
+    executePreparedQuery[(Int, String)](
+      parseLogin,
+      s"SELECT id, username from admin WHERE username=? AND password=?;",
+      List(admin, password)).headOption
   }
   def createNewUser(table: String, username: String, first: String, last:String, password: String): Option[(Int, String)] = {
     val header = s"${table}(username, first_name, last_name, password)"
@@ -89,12 +95,28 @@ object DBHelper {
   def getBestOfN(bestOfN: Int): List[(String, Int, Int, Int)] = {
     val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect, totalincorrect " +
       s"FROM score JOIN user u on score.user_id = u.ID ORDER BY bestscoreof${bestOfN} DESC, " +
-      "totalcorrect / (totalcorrect + totalincorrect) DESC LIMIT 3"
+      "totalcorrect / (totalcorrect + totalincorrect) DESC LIMIT 3;"
     executePreparedQuery[(String, Int, Int, Int)](parseBestOf, query)
   }
-  def getBestOfNByUser(user_id: Int, bestOfN: Int): List[(String, Int, Int, Int)] = {
+  def getBestOfNByUser(user_id: Int, bestOfN: Int): Option[(String, Int, Int, Int)] = {
     val query = s"SELECT u.username, bestscoreof${bestOfN} best, totalcorrect, totalincorrect " +
-      s"FROM score JOIN user u on score.user_id = u.ID WHERE u.ID=?"
-    executePreparedQuery[(String, Int, Int, Int)](parseBestOf, query, List(user_id))
+      s"FROM score JOIN user u on score.user_id = u.ID WHERE u.ID=?;"
+    executePreparedQuery[(String, Int, Int, Int)](parseBestOf, query, List(user_id)).headOption
+  }
+
+  def updateScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Unit = {
+    val header = "UPDATE score SET bestscoreof5=?, bestscoreof10=?, bestscoreof20=?, correct=?, incorrect=? " +
+      "WHERE user_id=? LIMIT 1;"
+    val values = List(best5, best10, best20, correct, incorrect, user_id)
+    val prepStr = getAllPlaceholders(1, values.length)
+  }
+
+  def insertNewScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Boolean = {
+    val header = "score(user_id, bestscoreof5, bestscoreof10, bestscoreof20, totalcorrect, totalincorrect)"
+    val values = List(user_id, best5, best10, best20, correct, incorrect)
+    val prepStr = getAllPlaceholders(1, values.length)
+//    println(getPreppedInsert(header, prepStr))
+//    println("Insert score?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+    executePreparedUpdate(getPreppedInsert(header, prepStr), values)
   }
 }

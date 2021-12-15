@@ -9,6 +9,9 @@ import sys.exit
 
 object Game {
   var logged_in_user: Option[(Int, String)] = None
+  def getUserID = (logged_in_user.get)._1
+  def getUsername = (logged_in_user.get)._2
+
   def main(args: Array[String]): Unit = {
     logged_in_user = Some((1, "QGuy"))
     viewScores()
@@ -79,8 +82,8 @@ object Game {
     println()
   }
 
-  def printUserBestOf(n: Int, id:Int): Unit = {
-    val (_, score, correct, incorrect) = getBestOfNByUser(id, n).head
+  def printUserBestOfN(n: Int, id:Int): Unit = {
+    val (_, score, correct, incorrect) = getBestOfNByUser(id, n).get
     val best = s"Best over $n: "
     val scoreStr: String = f"$score/$n"
     println(f"$best%14s  $scoreStr%5s   Ratio: ${correct.toFloat/(correct + incorrect)}%.2f%%")
@@ -92,9 +95,9 @@ object Game {
       val (id, name) = ((logged_in_user.get)._1, (logged_in_user.get)._2)
       println(s"$name's best scores: ")
       IO.printShortBreak()
-      printUserBestOf(20, id)
-      printUserBestOf(10, id)
-      printUserBestOf(5, id)
+      printUserBestOfN(20, id)
+      printUserBestOfN(10, id)
+      printUserBestOfN(5, id)
       println("Press Enter to continue: ")
       StdIn.readLine()
     }
@@ -140,13 +143,24 @@ object Game {
       else
         incorrect += 1
     }
+    println(s"You got $correct right out of $n!")
     if (logged_in_user.isEmpty) {
       println("Login or create an account to save your score!")
       logInUser()
     }
-    println(s"You got $correct right out of $n!")
+    val prevScore = getBestOfNByUser(getUserID, n)
+    prevScore match {
+      case Some((_, prevBest, prevCorrect, prevIncorrect)) =>
+//        val newCorrect =
+      case None =>
+        // create data,
+    }
 
+    // get previous score
+    // if it exists, max it and update row
+    // else insert new row
   }
+
 
 
 
