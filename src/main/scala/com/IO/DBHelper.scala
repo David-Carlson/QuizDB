@@ -46,7 +46,7 @@ object DBHelper {
   }
 
   def getAllQuestions(): List[Question] = {
-    Random.shuffle(executePreparedQuery[Question](parseQuestion, "SELECT * from question LIMIT 5;")
+    Random.shuffle(executePreparedQuery[Question](parseQuestion, "SELECT * from question;")
       .map(q => q.shuffle()))
   }
   def parseLogin(rs: ResultSet): (Int, String) = {

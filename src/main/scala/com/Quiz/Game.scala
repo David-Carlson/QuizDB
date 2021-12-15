@@ -11,9 +11,10 @@ object Game {
   var logged_in_user: Option[(Int, String)] = None
   def getUserID = (logged_in_user.get)._1
   def getUsername = (logged_in_user.get)._2
+  val cheat = true
 
   def main(args: Array[String]): Unit = {
-    logged_in_user = Some((4, "Elf3"))
+//    logged_in_user = Some((3, "Elf3"))
 //    viewScores()
 
     mainMenu()
@@ -122,17 +123,16 @@ object Game {
     } while (logged_in_user.isEmpty)
   }
 
-
   // Ask how many questions
   def playRound(n: Int): Unit = {
     val allQuestions = getAllQuestions().take(n)
 
-    var results = for ((q, idx) <- allQuestions.zip(LazyList.from(1))) yield {
+    val results = for ((q, idx) <- allQuestions.zip(LazyList.from(1))) yield {
       println(s"Question $idx: ")
       println(q)
-      println(s"Answer: ${q.getAnswer}")
-      println(s"Id: ${q.getID}")
-      var ans = IO.getInt()
+      if (cheat)
+        println(s"Answer: ${q.getAnswer}")
+      val ans = IO.getInt()
       (q.getID, ans == q.getAnswer)
     }
 

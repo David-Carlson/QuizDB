@@ -12,6 +12,12 @@ object DataCreator {
     createScoreboard()
   }
 
+  def adminRest(): Unit = {
+    createUser()
+    createQuestions()
+    createScoreboard()
+  }
+
   def createAdmin(): Unit = {
     val table = "CREATE TABLE admin (" +
       "ID SERIAL PRIMARY KEY," +
@@ -28,9 +34,9 @@ object DataCreator {
 
 
     println("Handling Admin table...")
-    println("Drop admin?: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
-    println("Create admin?: " + executeUpdate(table))
-    println("Insert admins?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values.flatten))
+    println("Dropping admin. Success?: " + executeUpdate("DROP TABLE IF EXISTS admin;"))
+    println("Creating admin. Success?: " + executeUpdate(table))
+    println("Inserting admins. Success?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values.flatten))
     println()
   }
 
@@ -43,17 +49,17 @@ object DataCreator {
       "password varchar(100) NOT NULL);"
     val header = "user(username, first_name, last_name, password)"
     val values = List(
-      List("QGuy", "Stephen", "Fry", "1234"),
       List("Elf1", "James", "Harkin", "2345"),
       List("Elf2", "Anna", "Ptaszynski", "2345"),
-      List("Elf3", "James", "Murray", "2345"))
+      List("Elf3", "James", "Murray", "2345"),
+      List("QGuy", "Stephen", "Fry", "1234"))
     val prepStr = getAllPlaceholders(values.length, values.head.length)
 
     
     println("Handling User table...")
-    println("Drop user?: " + executeUpdate("DROP TABLE IF EXISTS user;"))
-    println("Create user?: " + executeUpdate(table))
-    println("Insert users?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values.flatten))
+    println("Dropping user. Success?: " + executeUpdate("DROP TABLE IF EXISTS user;"))
+    println("Creating user. Success?: " + executeUpdate(table))
+    println("Inserting users. Success?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values.flatten))
     println()
   }
 
@@ -72,9 +78,9 @@ object DataCreator {
     val prepStr = getAllPlaceholders(questions.length, Question.length)
     val values = getQuestionPlaceholderValues(questions, 1)
     println("Handling Question table...")
-    println("Drop question?: " + executeUpdate("DROP TABLE IF EXISTS question;"))
-    println("Create question?: " + executeUpdate(table))
-    println("Insert questions?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
+    println("Dropping question. Success?: " + executeUpdate("DROP TABLE IF EXISTS question;"))
+    println("Creating question. Success?: " + executeUpdate(table))
+    println("Inserting questions. Success?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
     println()
   }
 
@@ -94,12 +100,10 @@ object DataCreator {
       List(4, 0, 0,  0,  0,  0))
     val prepStr = getAllPlaceholders(values.length, values.head.length)
 
-    println(getPreppedInsert(header, prepStr))
-
     println("Handling score table...")
-    println("Drop score?: " + executeUpdate("DROP TABLE IF EXISTS score;"))
-    println("Create score?: " + executeUpdate(table))
-    println("Insert score?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values.flatten))
+    println("Dropping score. Success?: " + executeUpdate("DROP TABLE IF EXISTS score;"))
+    println("Creating score. Success?: " + executeUpdate(table))
+    println("Inserting score. Success?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values.flatten))
     println()
   }
 
