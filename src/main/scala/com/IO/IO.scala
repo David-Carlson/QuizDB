@@ -8,7 +8,7 @@ object IO {
   def printShortBreak(): Unit = {
     println("---------------------")
   }
-  def getInt(min: Int = 1, max: Int = 4): Int = {
+  def readInt(min: Int = 1, max: Int = 4): Int = {
     var num = -1
     do {
       println(s"Enter a number from $min to $max: ")
@@ -22,7 +22,7 @@ object IO {
     num
   }
 
-  def inputUserAndPassword(): (String, String) = {
+  def readUsernameAndPassword(): (String, String) = {
     var (user, password) = ("", "")
     do {
       println("Enter your username and password in one line: ")
@@ -38,12 +38,11 @@ object IO {
     } while(user.length < 4 || password.length < 4)
     (user, password)
   }
-  def inputFirstLastName(): (String, String) = {
+  def readFirstAndLastname(): (String, String) = {
     var (first, last) = ("", "")
     do {
       println("Enter your first and last name in one line: ")
       val line = StdIn.readLine().split(" ")
-      println(line.length, "is my length")
       if (line.length != 2) {
         println("Format: 'First Last', e.g 'Keanu Reeves'")
       } else {

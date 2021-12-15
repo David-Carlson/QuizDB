@@ -7,14 +7,6 @@ import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 object DBHelper {
-  def main(args: Array[String]): Unit = {
-//    val header = "question(uploader, question, choice1, choice2, choice3, choice4, answer)"
-//    var q = new Question("What is wrong?", Seq("1", "2", "3", "4"), 1)
-//    var q2 = new Question("What is two?", Seq("1", "2", "3", "4"), 2)
-////    val place = getQuestionPlaceholders(Seq(q, q2))
-////    println(getPreppedInsert(header, place))
-//    getQuestionPlaceholderValues(Seq(q, q2), 1).map(println)
-  }
   def getInsertString(tableHeader: String, values: Iterable[String]): String = {
     "INSERT INTO " + tableHeader + "\nVALUES\n" + values.map(v => s"($v)").mkString(",\n") + ";"
   }
@@ -65,7 +57,7 @@ object DBHelper {
       None
     } else {
       println(s"Creating a new user...")
-      val (first, last) = IO.inputFirstLastName()
+      val (first, last) = IO.readFirstAndLastname()
       createNewUser("user", user, first, last, password)
     }
   }
@@ -80,6 +72,7 @@ object DBHelper {
     val prepStr = getAllPlaceholders(1, 4)
     val values = List(username, first, last, password)
     if (executePreparedUpdate(getPreppedInsert(header, prepStr), values)) {
+      println(s"User $username was created successfully")
       executePreparedQuery[(Int, String)](
         parseLogin,
         s"SELECT id, username from $table WHERE username=? AND password=?;",

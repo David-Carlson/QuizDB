@@ -1,7 +1,6 @@
 package com.Quiz
-import Question._
-import com.IO.DBHelper.{getAllQuestions, getBestOfN, getBestOfNByUser, getUserScore, insertNewScore, loginOrCreateAcnt, updateScore}
-import com.IO.{DBHelper, IO}
+import com.IO.DBHelper.{getAllQuestions, getBestOfN, getBestOfNByUser, getUserScore, insertNewScore, loginAdmin, loginOrCreateAcnt, updateScore}
+import com.IO.{DBHelper, DataCreator, IO}
 
 import scala.io.StdIn
 import sys.exit
@@ -11,28 +10,17 @@ object Game {
   var logged_in_user: Option[(Int, String)] = None
   def getUserID = (logged_in_user.get)._1
   def getUsername = (logged_in_user.get)._2
-  val cheat = true
+  val cheat = false
 
   def main(args: Array[String]): Unit = {
-//    logged_in_user = Some((3, "Elf3"))
-//    viewScores()
-
     mainMenu()
-//    logged_in_user = Some((10, "David"))
-//    logged_in_user = loginOrCreateAcnt("user", "Quizlet", "fdsa")
-//    logged_in_user match {
-//      case Some((id, name)) => {
-//        println(s"$id logged in with $name")
-//      }
-//      case None => println("No user returned")
-//    }
   }
 
 
   def mainMenu(): Unit = {
     while(true) {
       printMenu()
-        IO.getInt(0, 6) match {
+        IO.readInt(0, 6) match {
         case 1 => playRound(5)
         case 2 => playRound(10)
         case 3 => playRound(20)
@@ -49,19 +37,19 @@ object Game {
     logged_in_user match {
       case Some((id, name)) => {
         println(s"Welcome back, $name, to QuizBowl!")
-        print_middle_menu()
+        printMiddleMenu()
         println("6) Log out")
       }
       case None => {
         println(s"Welcome to QuizBowl!")
-        print_middle_menu()
+        printMiddleMenu()
         println("6) Log in")
       }
     }
     println("0) Quit")
     println()
   }
-  private def print_middle_menu(): Unit = {
+  private def printMiddleMenu(): Unit = {
     println()
     println("1) Play a round of 5 questions")
     println("2) Play a round of 10 questions")
@@ -70,7 +58,41 @@ object Game {
     println("5) View scores")
   }
   def adminMode(): Unit = {
+    while(true) {
+      println("Admin Portal")
+      IO.printShortBreak()
+      println("1) Login and reset databases")
+      println("2) Go back to main menu")
+      println("0) Quit program")
+      println()
+      val ans = IO.readInt(0, 2)
+      ans match {
+        case 1 =>
+          adminLogin()
+          return
+        case 2 => return
+        case 0 => exit
+      }
+    }
+  }
 
+  def adminLogin(): Unit = {
+    val (name, password) = IO.readUsernameAndPassword()
+    loginAdmin(name, password) match {
+      case Some((id, usrname)) =>
+        println(s"Admin $usrname, choose carefully: ")
+        IO.printBreak()
+        println("1) Drop and restore databases")
+        println("2) Return to main method")
+        println()
+        val ans = IO.readInt(1,2)
+        ans match {
+          case 1 =>
+            DataCreator.resetTables()
+        }
+      case None => println("Login information not correct, returning...")
+    }
+    println("Press Enter to continue: ")
   }
   def printBestOfN(n: Int): Unit = {
     println(s"Best scores for $n questions: ")
@@ -118,13 +140,17 @@ object Game {
   }
   def logInUser(): Unit = {
     do {
-      val (user, password) = IO.inputUserAndPassword()
+      val (user, password) = IO.readUsernameAndPassword()
       logged_in_user = DBHelper.loginOrCreateAcnt(user, password)
     } while (logged_in_user.isEmpty)
+    println("Logged in")
+    println("Press Enter to continue: ")
+    StdIn.readLine()
   }
 
   // Ask how many questions
   def playRound(n: Int): Unit = {
+    IO.printBreak()
     val allQuestions = getAllQuestions().take(n)
 
     val results = for ((q, idx) <- allQuestions.zip(LazyList.from(1))) yield {
@@ -132,7 +158,7 @@ object Game {
       println(q)
       if (cheat)
         println(s"Answer: ${q.getAnswer}")
-      val ans = IO.getInt()
+      val ans = IO.readInt()
       (q.getID, ans == q.getAnswer)
     }
 
@@ -153,14 +179,12 @@ object Game {
       case Some((prev5, prev10, prev20, prevCorrect, prevIncorrect)) =>
         val newCorrect = prevCorrect + correct
         val newIncorrect = prevIncorrect + incorrect
-        println("Got prev entry")
         n match {
           case 5 => updateScore(getUserID, math.max(prev5, correct), prev10, prev20, newCorrect, newIncorrect)
           case 10 => updateScore(getUserID, prev5, math.max(prev10, correct), prev20, newCorrect, newIncorrect)
           case 20 => updateScore(getUserID, prev5, prev10, math.max(prev20, correct), newCorrect, newIncorrect)
         }
       case None =>
-        println("No prev entry")
         n match {
           case 5 => insertNewScore(getUserID, correct, 0, 0, correct, incorrect)
           case 10 => insertNewScore(getUserID, 0, correct, 0, correct, incorrect)

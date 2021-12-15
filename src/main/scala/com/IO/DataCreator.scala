@@ -12,7 +12,7 @@ object DataCreator {
     createScoreboard()
   }
 
-  def adminRest(): Unit = {
+  def resetTables(): Unit = {
     createUser()
     createQuestions()
     createScoreboard()
@@ -28,8 +28,8 @@ object DataCreator {
     val header = "admin(username, first_name, last_name, password)"
     val values = List(
       List("root", "David", "Carlson", "1234"),
-      List("CSGUY", "Joe", "Pesci", "2345"),
-      List("Shades", "Mr", "Cool", "2345"))
+      List("CSGUY", "Joe", "Pesci", "1234"),
+      List("Shades", "Mr", "Cool", "1234"))
     val prepStr = getAllPlaceholders(values.length, values.head.length)
 
 
@@ -49,9 +49,9 @@ object DataCreator {
       "password varchar(100) NOT NULL);"
     val header = "user(username, first_name, last_name, password)"
     val values = List(
-      List("Elf1", "James", "Harkin", "2345"),
-      List("Elf2", "Anna", "Ptaszynski", "2345"),
-      List("Elf3", "James", "Murray", "2345"),
+      List("Elf1", "James", "Harkin", "1234"),
+      List("Elf2", "Anna", "Ptaszynski", "1234"),
+      List("Elf3", "James", "Murray", "1234"),
       List("QGuy", "Stephen", "Fry", "1234"))
     val prepStr = getAllPlaceholders(values.length, values.head.length)
 
