@@ -20,7 +20,7 @@ object Game {
   def mainMenu(): Unit = {
     while(true) {
       printMenu()
-        IO.readInt(0, 6) match {
+      IO.readInt(0, 6) match {
         case 1 => playRound(5)
         case 2 => playRound(10)
         case 3 => playRound(20)
@@ -92,7 +92,7 @@ object Game {
         }
       case None => println("Login information not correct, returning...")
     }
-    println("Press Enter to continue: ")
+    IO.pressEnter()
   }
   def printBestOfN(n: Int): Unit = {
     println(s"Best scores for $n questions: ")
@@ -100,35 +100,35 @@ object Game {
     IO.printShortBreak()
     getBestOfN(n).foreach(res => {
       val percent = res._3.toFloat/(res._3 + res._4)
-      println(f"${res._1}    ${res._2}%2d    $percent%.2f%%")
+      println(f"${res._1}%8s    ${res._2}%4d    $percent%.2f%%")
     })
     println()
   }
 
   def printUserBestOfN(n: Int, id:Int): Unit = {
     val (_, score, correct, incorrect) = getBestOfNByUser(id, n).get
-    val best = s"Best over $n: "
+    val best = s"Best over $n:"
     val scoreStr: String = f"$score/$n"
-    println(f"$best%14s  $scoreStr%5s   Ratio: ${correct.toFloat/(correct + incorrect)}%.2f%%")
+    println(f"$best%14s  $scoreStr%6s")
     println()
   }
 
   def viewScores(): Unit = {
     if (logged_in_user.isDefined) {
       val (id, name) = ((logged_in_user.get)._1, (logged_in_user.get)._2)
-      println(s"$name's best scores: ")
+      val (_, _, correct, incorrect) = getBestOfNByUser(id, 5).get
+      println(f"$name has a win/loss ratio of: ${correct.toFloat/(correct + incorrect)}%.2f%%")
+      println(s"Best scores: ")
       IO.printShortBreak()
       printUserBestOfN(20, id)
       printUserBestOfN(10, id)
       printUserBestOfN(5, id)
-      println("Press Enter to continue: ")
-      StdIn.readLine()
+      IO.pressEnter()
     }
     printBestOfN(20)
     printBestOfN(10)
     printBestOfN(5)
-    println("Press Enter to continue: ")
-    StdIn.readLine()
+    IO.pressEnter()
   }
   def loginOrLogout(): Unit = {
     logged_in_user match {
@@ -144,8 +144,7 @@ object Game {
       logged_in_user = DBHelper.loginOrCreateAcnt(user, password)
     } while (logged_in_user.isEmpty)
     println("Logged in")
-    println("Press Enter to continue: ")
-    StdIn.readLine()
+    IO.pressEnter()
   }
 
   // Ask how many questions

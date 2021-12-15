@@ -50,9 +50,10 @@ object DataCreator {
     val header = "user(username, first_name, last_name, password)"
     val values = List(
       List("Elf1", "James", "Harkin", "1234"),
-      List("Elf2", "Anna", "Ptaszynski", "1234"),
-      List("Elf3", "James", "Murray", "1234"),
-      List("QGuy", "Stephen", "Fry", "1234"))
+      List("2Cool", "Anna", "Ptaszynski", "1234"),
+      List("McFly", "James", "Murray", "1234"),
+      List("QGuy", "Stephen", "Fry", "1234"),
+      List("DrSalt", "Ryan", "Thames", "1234"))
     val prepStr = getAllPlaceholders(values.length, values.head.length)
 
     
@@ -97,7 +98,8 @@ object DataCreator {
       List(1, 3, 6, 13, 33, 25),
       List(2, 5, 8, 17, 89, 70),
       List(3, 2, 5, 11, 27, 30),
-      List(4, 0, 0,  0,  0,  0))
+      List(4, 0, 0,  0,  0,  0),
+      List(5, 2, 5, 15, 270, 300))
     val prepStr = getAllPlaceholders(values.length, values.head.length)
 
     println("Handling score table...")

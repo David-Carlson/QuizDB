@@ -8,6 +8,10 @@ object IO {
   def printShortBreak(): Unit = {
     println("---------------------")
   }
+  def pressEnter(): Unit = {
+    println("Press Enter to continue: ")
+    StdIn.readLine()
+  }
   def readInt(min: Int = 1, max: Int = 4): Int = {
     var num = -1
     do {
