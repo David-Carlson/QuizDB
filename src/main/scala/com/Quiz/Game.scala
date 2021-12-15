@@ -13,10 +13,10 @@ object Game {
   def getUsername = (logged_in_user.get)._2
 
   def main(args: Array[String]): Unit = {
-    logged_in_user = Some((1, "QGuy"))
-    viewScores()
+    logged_in_user = Some((4, "Elf3"))
+//    viewScores()
 
-//    mainMenu()
+    mainMenu()
 //    logged_in_user = Some((10, "David"))
 //    logged_in_user = loginOrCreateAcnt("user", "Quizlet", "fdsa")
 //    logged_in_user match {
@@ -118,7 +118,7 @@ object Game {
   def logInUser(): Unit = {
     do {
       val (user, password) = IO.inputUserAndPassword()
-      logged_in_user = DBHelper.loginOrCreateAcnt("user", user, password)
+      logged_in_user = DBHelper.loginOrCreateAcnt(user, password)
     } while (logged_in_user.isEmpty)
   }
 
@@ -153,22 +153,20 @@ object Game {
       case Some((prev5, prev10, prev20, prevCorrect, prevIncorrect)) =>
         val newCorrect = prevCorrect + correct
         val newIncorrect = prevIncorrect + incorrect
+        println("Got prev entry")
         n match {
-          case 5 => updateScore(getUserID, math.max(prev5, correct), prev10, prev20, prevCorrect + correct, prevIncorrect + incorrect)
-          case 10 => updateScore(getUserID, prev5, math.max(prev10, correct), prev20, prevCorrect + correct, prevIncorrect + incorrect)
-          case 20 => updateScore(getUserID, prev5, prev10, math.max(prev20, correct), prevCorrect + correct, prevIncorrect + incorrect)
+          case 5 => updateScore(getUserID, math.max(prev5, correct), prev10, prev20, newCorrect, newIncorrect)
+          case 10 => updateScore(getUserID, prev5, math.max(prev10, correct), prev20, newCorrect, newIncorrect)
+          case 20 => updateScore(getUserID, prev5, prev10, math.max(prev20, correct), newCorrect, newIncorrect)
         }
       case None =>
+        println("No prev entry")
         n match {
           case 5 => insertNewScore(getUserID, correct, 0, 0, correct, incorrect)
           case 10 => insertNewScore(getUserID, 0, correct, 0, correct, incorrect)
           case 20 => insertNewScore(getUserID, 0, 0, correct, correct, incorrect)
         }
     }
-
-    // get previous score
-    // if it exists, max it and update row
-    // else insert new row
   }
 
 

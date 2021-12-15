@@ -80,10 +80,10 @@ object DBHelper {
     val prepStr = getAllPlaceholders(1, 4)
     val values = List(username, first, last, password)
     if (executePreparedUpdate(getPreppedInsert(header, prepStr), values)) {
-      executePreparedQuery[Option[(Int, String)] ](
+      executePreparedQuery[(Int, String)](
         parseLogin,
         s"SELECT id, username from $table WHERE username=? AND password=?;",
-        List(username, password)).head
+        List(username, password)).headOption
     } else {
       println(s"Error creating $table")
       None
@@ -114,19 +114,16 @@ object DBHelper {
   }
 
   def updateScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Boolean = {
-    val header = "UPDATE score SET bestscoreof5=?, bestscoreof10=?, bestscoreof20=?, correct=?, incorrect=? " +
+    val query = "UPDATE score SET bestscoreof5=?, bestscoreof10=?, bestscoreof20=?, totalcorrect=?, totalincorrect=? " +
       "WHERE user_id=? LIMIT 1;"
     val values = List(best5, best10, best20, correct, incorrect, user_id)
-    val prepStr = getAllPlaceholders(1, values.length)
-    executePreparedUpdate(getPreppedInsert(header, prepStr), values)
+    executePreparedUpdate(query, values)
   }
 
   def insertNewScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Boolean = {
     val header = "score(user_id, bestscoreof5, bestscoreof10, bestscoreof20, totalcorrect, totalincorrect)"
     val values = List(user_id, best5, best10, best20, correct, incorrect)
     val prepStr = getAllPlaceholders(1, values.length)
-//    println(getPreppedInsert(header, prepStr))
-//    println("Insert score?: " + executePreparedUpdate(getPreppedInsert(header, prepStr), values))
     executePreparedUpdate(getPreppedInsert(header, prepStr), values)
   }
 }
