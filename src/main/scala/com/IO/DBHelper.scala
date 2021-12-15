@@ -103,12 +103,22 @@ object DBHelper {
       s"FROM score JOIN user u on score.user_id = u.ID WHERE u.ID=?;"
     executePreparedQuery[(String, Int, Int, Int)](parseBestOf, query, List(user_id)).headOption
   }
+  def parseUserScore(rs: ResultSet): (Int, Int, Int, Int, Int) = {
+    (rs.getInt("bestscoreof5"), rs.getInt("bestscoreof10"),
+      rs.getInt("bestscoreof20"),rs.getInt("totalcorrect"), rs.getInt("totalincorrect"))
+  }
+  def getUserScore(user_id: Int): Option[(Int, Int, Int, Int, Int)] = {
+    val query = s"SELECT bestscoreof5, bestscoreof10, bestscoreof20, totalcorrect, totalincorrect " +
+      s"FROM score WHERE score.user_id=?;"
+    executePreparedQuery[(Int, Int, Int, Int, Int)](parseUserScore, query, List(user_id)).headOption
+  }
 
-  def updateScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Unit = {
+  def updateScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Boolean = {
     val header = "UPDATE score SET bestscoreof5=?, bestscoreof10=?, bestscoreof20=?, correct=?, incorrect=? " +
       "WHERE user_id=? LIMIT 1;"
     val values = List(best5, best10, best20, correct, incorrect, user_id)
     val prepStr = getAllPlaceholders(1, values.length)
+    executePreparedUpdate(getPreppedInsert(header, prepStr), values)
   }
 
   def insertNewScore(user_id: Int, best5: Int, best10: Int, best20: Int, correct: Int, incorrect: Int): Boolean = {

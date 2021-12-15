@@ -1,6 +1,6 @@
 package com.Quiz
 import Question._
-import com.IO.DBHelper.{getAllQuestions, getBestOfN, getBestOfNByUser, loginOrCreateAcnt}
+import com.IO.DBHelper.{getAllQuestions, getBestOfN, getBestOfNByUser, getUserScore, insertNewScore, loginOrCreateAcnt, updateScore}
 import com.IO.{DBHelper, IO}
 
 import scala.io.StdIn
@@ -148,12 +148,22 @@ object Game {
       println("Login or create an account to save your score!")
       logInUser()
     }
-    val prevScore = getBestOfNByUser(getUserID, n)
+    val prevScore = getUserScore(getUserID)
     prevScore match {
-      case Some((_, prevBest, prevCorrect, prevIncorrect)) =>
-//        val newCorrect =
+      case Some((prev5, prev10, prev20, prevCorrect, prevIncorrect)) =>
+        val newCorrect = prevCorrect + correct
+        val newIncorrect = prevIncorrect + incorrect
+        n match {
+          case 5 => updateScore(getUserID, math.max(prev5, correct), prev10, prev20, prevCorrect + correct, prevIncorrect + incorrect)
+          case 10 => updateScore(getUserID, prev5, math.max(prev10, correct), prev20, prevCorrect + correct, prevIncorrect + incorrect)
+          case 20 => updateScore(getUserID, prev5, prev10, math.max(prev20, correct), prevCorrect + correct, prevIncorrect + incorrect)
+        }
       case None =>
-        // create data,
+        n match {
+          case 5 => insertNewScore(getUserID, correct, 0, 0, correct, incorrect)
+          case 10 => insertNewScore(getUserID, 0, correct, 0, correct, incorrect)
+          case 20 => insertNewScore(getUserID, 0, 0, correct, correct, incorrect)
+        }
     }
 
     // get previous score
